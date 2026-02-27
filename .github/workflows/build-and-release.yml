@@ -19,7 +19,6 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      # 直接下载 Gradle 并解压，不用 gradlew
       - name: Download and setup Gradle 8.8
         run: |
           wget -q https://mirrors.aliyun.com/maven/gradle/gradle-8.8-bin.zip

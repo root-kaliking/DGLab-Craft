@@ -18,19 +18,16 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-          cache: gradle
 
-      - name: Grant execute permission to gradlew
-        run: chmod +x ./gradlew
-
-      - name: Build with Gradle (with retry)
+      # 直接下载 Gradle 并解压，不用 gradlew
+      - name: Download and setup Gradle 8.8
         run: |
-          # 最多重试3次，每次间隔5秒
-          for i in 1 2 3; do
-            ./gradlew build --stacktrace -Dorg.gradle.daemon=false -Dorg.gradle.internal.http.connectionTimeout=60000 -Dorg.gradle.internal.http.socketTimeout=60000 && break
-            echo "第 $i 次构建失败，5秒后重试..."
-            sleep 5
-          done
+          wget -q https://mirrors.aliyun.com/maven/gradle/gradle-8.8-bin.zip
+          unzip -q gradle-8.8-bin.zip -d $HOME
+          echo "$HOME/gradle-8.8/bin" >> $GITHUB_PATH
+
+      - name: Build with Gradle
+        run: gradle build --stacktrace
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4

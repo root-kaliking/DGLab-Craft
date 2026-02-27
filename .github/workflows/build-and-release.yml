@@ -23,8 +23,14 @@ jobs:
       - name: Grant execute permission to gradlew
         run: chmod +x ./gradlew
 
-      - name: Build with Gradle
-        run: ./gradlew build --stacktrace
+      - name: Build with Gradle (with retry)
+        run: |
+          # 最多重试3次，每次间隔5秒
+          for i in 1 2 3; do
+            ./gradlew build --stacktrace -Dorg.gradle.daemon=false -Dorg.gradle.internal.http.connectionTimeout=60000 -Dorg.gradle.internal.http.socketTimeout=60000 && break
+            echo "第 $i 次构建失败，5秒后重试..."
+            sleep 5
+          done
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
